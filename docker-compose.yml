@@ -1,0 +1,21 @@
+services:
+  pgsql:
+    image: 'postgres:17'
+    container_name: inventario_soa_db
+    ports:
+      - '5432:5432'
+    environment:
+      PGPASSWORD: 'password'
+      POSTGRES_DB: 'inventario_soa'
+      POSTGRES_USER: 'sail'
+      POSTGRES_PASSWORD: 'password'
+    volumes:
+      - 'inventario-soa-pgsql:/var/lib/postgresql/data'
+    healthcheck:
+      test: ["CMD", "pg_isready", "-q", "-d", "inventario_soa", "-U", "sail"]
+      retries: 3
+      timeout: 5s
+
+volumes:
+  inventario-soa-pgsql:
+    driver: local
