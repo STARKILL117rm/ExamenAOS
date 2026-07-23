@@ -2,19 +2,14 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use MongoDB\Laravel\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Producto extends Model
 {
-    /**
-     * The table associated with the model.
-     */
-    protected $table = 'productos';
+    protected $connection = 'mongodb';
+    protected $collection = 'productos';
 
-    /**
-     * The attributes that are mass assignable.
-     */
     protected $fillable = [
         'categoria_id',
         'nombre',
@@ -23,9 +18,6 @@ class Producto extends Model
         'stock',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     */
     protected function casts(): array
     {
         return [
@@ -34,9 +26,6 @@ class Producto extends Model
         ];
     }
 
-    /**
-     * Get the categoria that owns the producto.
-     */
     public function categoria(): BelongsTo
     {
         return $this->belongsTo(Categoria::class);

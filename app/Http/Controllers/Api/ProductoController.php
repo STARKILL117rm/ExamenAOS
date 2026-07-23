@@ -9,29 +9,19 @@ use Illuminate\Http\Request;
 
 class ProductoController extends Controller
 {
-    /**
-     * Display a listing of all productos.
-     *
-     * GET /api/productos
-     */
     public function index(): JsonResponse
     {
-        $productos = Producto::with('categoria')->get();
+        $productos = Producto::all();
 
         return response()->json([
-            'mensaje' => 'Lista de productos',
+            'mensaje' => 'Lista de productos (desde MongoDB)',
             'productos' => $productos,
         ], 200);
     }
 
-    /**
-     * Display the specified producto.
-     *
-     * GET /api/productos/{id}
-     */
-    public function show(int $id): JsonResponse
+    public function show(string $id): JsonResponse
     {
-        $producto = Producto::with('categoria')->find($id);
+        $producto = Producto::find($id);
 
         if (!$producto) {
             return response()->json([
@@ -45,15 +35,10 @@ class ProductoController extends Controller
         ], 200);
     }
 
-    /**
-     * Store a newly created producto.
-     *
-     * POST /api/productos
-     */
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'categoria_id' => 'required|exists:categorias,id',
+            'categoria_id' => 'required|exists:pgsql.categorias,id',
             'nombre'       => 'required|string|max:150',
             'descripcion'  => 'nullable|string',
             'precio'       => 'required|numeric|min:0',
@@ -61,10 +46,9 @@ class ProductoController extends Controller
         ]);
 
         $producto = Producto::create($validated);
-        $producto->load('categoria');
 
         return response()->json([
-            'mensaje' => 'Producto creado exitosamente',
+            'mensaje' => 'Producto creado exitosamente en MongoDB',
             'producto' => $producto,
         ], 201);
     }
