@@ -16,3 +16,4 @@ use App\Http\Controllers\Api\ProductoController;
 Route::get('/productos', [ProductoController::class, 'index']);
 Route::get('/productos/{id}', [ProductoController::class, 'show']);
 Route::post('/productos', [ProductoController::class, 'store']);
+Route::get('/inventario-completo', [ProductoController::class, 'inventarioCompleto']);

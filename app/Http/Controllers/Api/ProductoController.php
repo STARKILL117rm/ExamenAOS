@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Producto;
+use App\Models\Categoria;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -51,5 +52,33 @@ class ProductoController extends Controller
             'mensaje' => 'Producto creado exitosamente en MongoDB',
             'producto' => $producto,
         ], 201);
+    }
+
+    /**
+     * Devuelve el inventario consolidado uniendo Categorías (PostgreSQL) 
+     * con sus Productos (MongoDB).
+     */
+    public function inventarioCompleto(): JsonResponse
+    {
+        // 1. Obtener categorías desde PostgreSQL
+        $categorias = Categoria::all();
+
+        // 2. Mapear e incorporar productos desde MongoDB
+        $resultado = $categorias->map(function ($categoria) {
+            $productos = Producto::where('categoria_id', (int)$categoria->id)->get();
+
+            return [
+                'categoria_id'     => $categoria->id,
+                'nombre_categoria' => $categoria->nombre,
+                'descripcion'      => $categoria->descripcion,
+                'total_productos'  => $productos->count(),
+                'productos'        => $productos,
+            ];
+        });
+
+        return response()->json([
+            'mensaje' => 'Consolidado híbrido de inventario (PostgreSQL + MongoDB)',
+            'data'    => $resultado,
+        ], 200);
     }
 }
