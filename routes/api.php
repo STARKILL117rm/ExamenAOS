@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\ProductoController;
+use App\Http\Middleware\ApiKeyMiddleware;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,7 +14,12 @@ use App\Http\Controllers\Api\ProductoController;
 |
 */
 
+// Rutas públicas de productos (MongoDB)
 Route::get('/productos', [ProductoController::class, 'index']);
 Route::get('/productos/{id}', [ProductoController::class, 'show']);
 Route::post('/productos', [ProductoController::class, 'store']);
-Route::get('/inventario-completo', [ProductoController::class, 'inventarioCompleto']);
+
+// Ruta protegida por API Key para la comunicación inter-servicios
+Route::middleware([ApiKeyMiddleware::class])->group(function () {
+    Route::get('/inventario-completo', [ProductoController::class, 'inventarioCompleto']);
+});

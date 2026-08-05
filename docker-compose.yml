@@ -1,4 +1,5 @@
 services:
+  # 1. Base de datos Relacional (PostgreSQL)
   pgsql:
     image: 'postgres:17'
     container_name: inventario_soa_db
@@ -12,10 +13,34 @@ services:
     volumes:
       - 'inventario-soa-pgsql:/var/lib/postgresql/data'
     healthcheck:
-      test: ["CMD", "pg_isready", "-q", "-d", "inventario_soa", "-U", "sail"]
+      test: [ "CMD", "pg_isready", "-q", "-d", "inventario_soa", "-U", "sail" ]
       retries: 3
       timeout: 5s
 
+  # 2. Base de datos NoSQL (MongoDB)
+  mongodb:
+    image: 'mongo:latest'
+    container_name: inventario_soa_mongo
+    ports:
+      - '27017:27017'
+    volumes:
+      - 'inventario-soa-mongo:/data/db'
+
+  # 3. Microservicio Auxiliar de Reportes (Node.js)
+  microservicio-reportes:
+    build:
+      context: ./microservicio-reportes
+    container_name: inventario_soa_node
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+    depends_on:
+      - pgsql
+      - mongodb
+
 volumes:
   inventario-soa-pgsql:
+    driver: local
+  inventario-soa-mongo:
     driver: local
